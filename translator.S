@@ -113,7 +113,7 @@ mv a1, s11              # 32-bit
 ecall                   # transfer control to OS(venus here) to free space
 # free space of 16-bit, compressed instruction
 li a0, 0x3CC            # vlib page
-li a6, 4                # free
+li a6, 4                # free(frees the pointer given in a1. It will merge other free blocks around it if any exist. Does not return anything)
 mv a1, s10              # 16-bit
 ecall                   # transfer control to OS(venus here) to free space
 # free complete
