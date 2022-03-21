@@ -56,7 +56,7 @@ li a6, 2                # calloc
 li a1, 100              # 100 items in total
 li a2, 20               # size of item "instruction"
 ecall                   # transfer control to OS(venus here) to calloc space
-mv s10, a0              # global var s11, to save the address
+mv s10, a0              # global var s10, to save the address
 # setup complete
 la s0, rvc_codes                # load the address of first instruction
 li t0, 0                        # current working instruction
