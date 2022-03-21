@@ -89,9 +89,44 @@ finish_reading:
 # parse all 32-bit instructions here
 add zero, zero, zero
 
-
 # parse all compressed instructions
-add zero, zero, zero
+li t0, 0                        # t0 is the number of (compressed) instruction we are dealing with
+mul t1, t0, s8                  # t1 is the relative address of current instruction
+add t1, t1, s10                 # Now t1 is the absolute address of current instruction
+parse_CI_main_loop:
+beq t0, s7, finish_parse_CI     # if (t0 == s7) finish
+addi t0, t0, 1                  # t0 += 1; t0 should not be used until next loop
+lw t2, 0(t1)                    # originalValue is loaded into t2
+beqz t2, parse_CI_main_loop     # if (compressed[i] == NULL) continue;
+# here we are going to parse a valid compressed risc-v instruction
+srli t3, t2, 12                 # funct4 = originalValue >> 12;
+sb t3, 4(t1)                    # store funct4 to memory
+srli t3, t2, 13                 # funct3 = originalValue >> 13;
+sb t3, 5(t1)                    # store funct3 to memory
+srli t3, t2, 10                 # funct6 = originalValue >> 10;
+sb t3, 6(t1)                    # store funct6 to memory
+                                # TODO: funct2 here
+srli t3, t2, 7                  # rd/rs1 = (ov >> 7) & 0b11111
+andi t3, t3, 0b11111            # rd/rs1 = (ov >> 7) & 0b11111
+sb t3, 8(t1)                    # store rd/rs1 to memory
+srli t3, t2, 2                  # rs2 = (ov >> 2) & 0b11111
+andi t3, t3, 0b11111            # rs2 = (ov >> 2) & 0b11111
+sb t3, 9(t1)                    # store rd/rs1 to memory
+srli t3, t2, 7                  # rs1' = (ov >> 7) & 0b111
+andi t3, t3, 0b111              # rs1' = (ov >> 7) & 0b111
+sb t3, 10(t1)                   # store rs1' to memory
+srli t3, t2, 2                  # rs2' = (ov >> 2) & 0b111
+andi t3, t3, 0b111              # rs2' = (ov >> 2) & 0b111
+sb t3, 11(t1)                   # store rs2' to memory
+srli t3, t2, 7                  # rd' = (ov >> 7) & 0b111 (rd' = rs1')
+andi t3, t3, 0b111              # rd' = (ov >> 7) & 0b111 (rd' = rs1')
+sb t3, 12(t1)                   # store rd' to memory (rd' = rs1')
+andi t3, t2, 0b11               # opcode = ov & 0b11
+sb t3, 13(t1)                   # store opcode to memory
+                                # TODO: imm here
+
+j parse_CI_main_loop
+finish_parse_CI:
 
 # expand all compressed instructions
 add zero, zero, zero
@@ -99,7 +134,7 @@ add zero, zero, zero
 # update all addresses
 add zero, zero, zero
 
-# write "originalValue" field for compressed instructions
+# write "originalValue" field for instructions
 add zero, zero, zero
 
 # print to file
