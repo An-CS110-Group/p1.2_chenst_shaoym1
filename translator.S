@@ -132,7 +132,7 @@ andi t3, t3, 0b111              # rd' = (ov >> 7) & 0b111 (rd' = rs1')
 sb t3, 12(t1)                   # store rd' to memory (rd' = rs1')
 andi t3, t2, 0b11               # opcode = ov & 0b11
 sb t3, 13(t1)                   # store opcode to memory
-                                # TODO: imm here
+
 lbu t3, 13(t1)                  # t3 = opcode
 beqz t3, CL_CS                  # opcode = 0b00
 li t4, 0b01
@@ -165,13 +165,63 @@ bnez t3, CI_CB_2                # if (t3 != 0b11) CB_2;
 li t4, 0                        # No imm field
 j end_of_imm
 
-
 CB_1:
+li t4, 0                        # t4 = imm
+srli t5, t2, 3                  # offset[2:1]
+andi t5, t5, 0b11               # offset[2:1]
+or t4, t4, t5                   # load offset[2:1]
+srli t5, t2, 10                 # offset[4:3]
+andi t5, t5, 0b11               # offset[4:3]
+slli t5, t5, 2                  # load offset[4:3]
+or t4, t4, t5                   # load offset[4:3]
+srli t5, t2, 2                  # offset[5]
+andi t5, t5, 1                  # offset[5]
+slli t5, t5, 4                  # load offset[5]
+or t4, t4, t5                   # load offset[5]
+srli t5, t2, 5                  # offset[7:6]
+andi t5, t5, 0b11               # offset[7:6]
+slli t5, t5, 5                  # load offset[7:6]
+or t4, t4, t5                   # load offset[7:6]
+srli t5, t2, 12                 # offset[8]
+andi t5, t5, 1                  # offset[8]
+slli t5, t5, 7                  # load offset[8]
+or t4, t4, t5                   # load offset[8]
 j end_of_imm
 
 CJ:
+li t4, 0                        # t4 = imm
+srli t5, t2, 3                  # offset[3:1]
+andi t5, t5, 0b111              # offset[3:1]
+or t4, t4, t5                   # load offset[3:1]
+srli t5, t2, 11                 # offset[4]
+andi t5, t5, 1                  # offset[4]
+slli t5, t5, 3                  # load offset[4]
+or t4, t4, t5                   # load offset[4]
+srli t5, t2, 2                  # offset[5]
+andi t5, t5, 1                  # offset[5]
+slli t5, t5, 4                  # load offset[5]
+or t4, t4, t5                   # load offset[5]
+srli t5, t2, 7                  # offset[6]
+andi t5, t5, 1                  # offset[6]
+slli t5, t5, 5                  # load offset[6]
+or t4, t4, t5                   # load offset[6]
+srli t5, t2, 6                  # offset[7]
+andi t5, t5, 1                  # offset[7]
+slli t5, t5, 6                  # load offset[7]
+or t4, t4, t5                   # load offset[7]
+srli t5, t2, 9                  # offset[9:8]
+andi t5, t5, 0b11               # offset[9:8]
+slli t5, t5, 7                  # load offset[9:8]
+or t4, t4, t5                   # load offset[9:8]
+srli t5, t2, 8                  # offset[10]
+andi t5, t5, 1                  # offset[10]
+slli t5, t5, 9                  # load offset[10]
+or t4, t4, t5                   # load offset[10]
+srli t5, t2, 12                 # offset[11]
+andi t5, t5, 1                  # offset[11]
+slli t5, t5, 10                 # load offset[11]
+or t4, t4, t5                   # load offset[11]
 j end_of_imm
-
 
 CI_CB_2:
 li t4, 0                        # t4 = imm
