@@ -133,8 +133,76 @@ sb t3, 12(t1)                   # store rd' to memory (rd' = rs1')
 andi t3, t2, 0b11               # opcode = ov & 0b11
 sb t3, 13(t1)                   # store opcode to memory
                                 # TODO: imm here
+lbu t3, 13(t1)                  # t3 = opcode
+beqz t3, CL_CS                  # opcode = 0b00
+li t4, 0b01
+beq t3, t4, imm_other           # opcode = 0b01
+        # opcode = 0b10
+srli t4, t2, 15                 # The right most bit of instruction
+beqz t4, CI_CB_2                # SLLI
+li t4, 0                        # No imm field
+j end_of_imm
 
+imm_other:                      # opcode = 0b01
+lbu t3, 5(t1)                   # t3 = funct3
+li t4, 0b010                    # CI-format
+beq t3, t4, CI_CB_2             # CI-format
+li t4, 0b011                    # CI-format
+beq t3, t4, CI_CB_2             # CI-format
+beqz t3, CI_CB_2                # CI-format
+li t4, 0b110                    # CB_1-format
+beq t3, t4, CB_1                # CB_1-format
+li t4, 0b111                    # CB_1-format
+beq t3, t4, CB_1                # CB_1-format
+li t4, 0b101                    # CJ-format
+beq t3, t4, CJ                  # CJ-format
+li t4, 0b001                    # CJ-format
+beq t3, t4, CJ                  # CJ-format
+srli t3, t2, 10                 # t3 = (ov >> 10) & 0b11
+andi t3, t3, 0b11               # t3 = (ov >> 10) & 0b11
+addi t3, t3, -0b11              # if (t3 != 0b11) CB_2;
+bnez t3, CI_CB_2                # if (t3 != 0b11) CB_2;
+li t4, 0                        # No imm field
+j end_of_imm
+
+
+CB_1:
+j end_of_imm
+
+CJ:
+j end_of_imm
+
+
+CI_CB_2:
+li t4, 0                        # t4 = imm
+srli t5, t2, 2                  # imm[4:0]
+andi t5, t5, 0b11111            # imm[4:0]
+or t4, t4, t5                   # load imm[4:0]
+srli t5, t2, 12                 # imm[5]
+andi t5, t5, 1                  # imm[5]
+slli t5, t5, 5                  # load imm[5]
+or t4, t4, t5                   # load imm[5]
+j end_of_imm
+
+CL_CS:
+li t4, 0                        # t4 = imm
+srli t5, t2, 6                  # offset[2]
+andi t5, t5, 1                  # offset[2]
+or t4, t4, t5                   # load offset[2]
+srli t5, t2, 10                 # offset[5:3]
+andi t5, t5, 0b111              # offset[5:3]
+slli t5, t5, 1                  # load offset[5:3]
+or t4, t4, t5                   # load offset[5:3]
+srli t5, t2, 5                  # offset[6]
+andi t5, t5, 1                  # offset[6]
+slli t5, t5, 4                  # load offset[6]
+or t4, t4, t5                   # load offset[6]
+j end_of_imm                    # imm has been set to t4
+
+end_of_imm:
+sw t4, 16(t1)                   # save imm to memory
 j parse_CI_main_loop
+
 finish_parse_CI:
 
 # expand all compressed instructions
