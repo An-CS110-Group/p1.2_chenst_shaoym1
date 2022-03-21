@@ -45,7 +45,7 @@ li s9, 32
 li s8, 20
 # Allocate space (set to zero) for 32-bit instruction
 li a0, 0x3CC            # vlib page
-li a6, 2                # calloc
+li a6, 2                # calloc... Takes in a1 nitems and a2 size of each item. Zeros out the allocated memory. Returns a pointer to that block in a0
 li a1, 100              # 100 items in total
 li a2, 32               # size of item "instruction"
 ecall                   # transfer control to OS(venus here) to calloc space
@@ -56,7 +56,7 @@ li a6, 2                # calloc
 li a1, 100              # 100 items in total
 li a2, 20               # size of item "instruction"
 ecall                   # transfer control to OS(venus here) to calloc space
-mv s10, a0              # global var s11, to save the address
+mv s10, a0              # global var s10, to save the address
 # setup complete
 la s0, rvc_codes                # load the address of first instruction
 li t0, 0                        # current working instruction
@@ -88,6 +88,7 @@ finish_reading:
 
 # parse all 32-bit instructions here
 add zero, zero, zero
+
 
 # parse all compressed instructions
 add zero, zero, zero
@@ -137,7 +138,7 @@ mv a1, s11              # 32-bit
 ecall                   # transfer control to OS(venus here) to free space
 # free space of 16-bit, compressed instruction
 li a0, 0x3CC            # vlib page
-li a6, 4                # free
+li a6, 4                # free(frees the pointer given in a1. It will merge other free blocks around it if any exist. Does not return anything)
 mv a1, s10              # 16-bit
 ecall                   # transfer control to OS(venus here) to free space
 # free complete
