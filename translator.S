@@ -102,6 +102,31 @@ add zero, zero, zero
 add zero, zero, zero
 
 # print to file
+li t0, 0                        # t0 stands for current position
+print_next:
+beq t0, s7, finish_print        # finish printing if all lines are finished
+mul t1, t0, s9                  # multiple by 32 to get relative position
+add t1, t1, s11                 # Get the absolute address (saved in t1)
+lw t2, 0(t1)                    # The "originalValue" field is saved in t2
+
+li t3, 31                       # start loop
+print_next_bit:
+blt t3, zero, finish_single_ins # All bits of this instruction is printed
+srl t4, t2, t3                  # Now the bit we want is in the rightmost bit
+andi t4, t4, 1                  # The only bit left is what we want
+mv a1, t4                       # Now print!
+li a0, 1                        # "print_int" option in venus
+ecall
+addi t3, t3, -1                 # move onto the next bit
+j print_next_bit
+finish_single_ins:
+addi t0, t0, 1                  # move onto the next instruction
+li a1, 10                       # Now print '\n' here
+li a0, 11                       # "print_character" option in venus
+ecall
+j print_next
+
+finish_print:
 add zero, zero, zero
 
 # free all memory allocated
