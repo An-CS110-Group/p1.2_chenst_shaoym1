@@ -76,8 +76,22 @@ addi t0, t0, 1                  # Next instruction
 j read_next                     # Go back to loop
 finish_reading:
 
+# parse all 32-bit instructions here
 add zero, zero, zero
+
+# parse all compressed instructions
 add zero, zero, zero
+
+# expand all compressed instructions
+add zero, zero, zero
+
+# update all addresses
+add zero, zero, zero
+
+# write "originalValue" field for compressed instructions
+add zero, zero, zero
+
+# print to file
 add zero, zero, zero
 
 # free all memory allocated
