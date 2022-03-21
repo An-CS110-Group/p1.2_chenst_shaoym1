@@ -50,7 +50,7 @@ li a1, 100              # 100 items in total
 li a2, 32               # size of item "instruction"
 ecall                   # transfer control to OS(venus here) to calloc space
 mv s11, a0              # global var s11, to save the address
-# Allocate space (set to zero) for 16-bit, cocmpressed instruction
+# Allocate space (set to zero) for 16-bit, compressed instruction
 li a0, 0x3CC            # vlib page
 li a6, 2                # calloc
 li a1, 100              # 100 items in total
@@ -58,18 +58,7 @@ li a2, 20               # size of item "instruction"
 ecall                   # transfer control to OS(venus here) to calloc space
 mv s10, a0              # global var s11, to save the address
 # setup complete
-
-la s0, rvc_codes                # load the address of first instruction
-li t0, 0                        # current working instruction
-li t1, 0x3                      # constant 0b11
-read_next:
-beq t0, s7, finish_reading      # finish reading if reaches the end
-lhu s1, 0(s0)                   # load half word
-addi s0, s0, 2                  # Go to the next half-word
-andi s2, s1, 0x3                # last 2 bits (if equal to 0x3, 32-bit instruction)
-bne s2, t1, NCI_read            # Non compressed instruction
-lhu s3, 0(s0)                   # Upper 16 bit of 32-bit instruction
-addi s0, s0, 2                  # Go to the next half-word
+Allocate space (set to zero) ford
 slli s3, s3, 16                 # Upper 16 bit
 or s1, s1, s3                   # Now the whole 32-bit instruction is in the register
 # putting 32-bit instruction into memory
@@ -86,11 +75,25 @@ sw s1, 0(t2)                    # save word to it
 addi t0, t0, 1                  # Next instruction
 j read_next                     # Go back to loop
 finish_reading:
+
+add zero, zero, zero
+add zero, zero, zero
 add zero, zero, zero
 
-
+# free all memory allocated
+# free space of 32-bit instruction
+li a0, 0x3CC            # vlib page
+li a6, 4                # free
+mv a1, s11              # 32-bit
+ecall                   # transfer control to OS(venus here) to free space
+# free space of 16-bit, compressed instruction
+li a0, 0x3CC            # vlib page
+li a6, 4                # free
+mv a1, s10              # 16-bit
+ecall                   # transfer control to OS(venus here) to free space
+# free complete
 
 # Exit with error code 0
-add	   a1, x0, x0
-addi   a0, x0, 17
+add a1, x0, x0
+addi a0, x0, 17
 ecall
