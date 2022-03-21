@@ -45,7 +45,7 @@ li s9, 32
 li s8, 20
 # Allocate space (set to zero) for 32-bit instruction
 li a0, 0x3CC            # vlib page
-li a6, 2                # calloc
+li a6, 2                # calloc... Takes in a1 nitems and a2 size of each item. Zeros out the allocated memory. Returns a pointer to that block in a0
 li a1, 100              # 100 items in total
 li a2, 32               # size of item "instruction"
 ecall                   # transfer control to OS(venus here) to calloc space
@@ -78,6 +78,7 @@ finish_reading:
 
 # parse all 32-bit instructions here
 add zero, zero, zero
+
 
 # parse all compressed instructions
 add zero, zero, zero
