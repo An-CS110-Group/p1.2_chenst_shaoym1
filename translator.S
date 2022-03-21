@@ -58,7 +58,17 @@ li a2, 20               # size of item "instruction"
 ecall                   # transfer control to OS(venus here) to calloc space
 mv s10, a0              # global var s11, to save the address
 # setup complete
-Allocate space (set to zero) ford
+la s0, rvc_codes                # load the address of first instruction
+li t0, 0                        # current working instruction
+li t1, 0x3                      # constant 0b11
+read_next:
+beq t0, s7, finish_reading      # finish reading if reaches the end
+lhu s1, 0(s0)                   # load half word
+addi s0, s0, 2                  # Go to the next half-word
+andi s2, s1, 0x3                # last 2 bits (if equal to 0x3, 32-bit instruction)
+bne s2, t1, NCI_read            # Non compressed instruction
+lhu s3, 0(s0)                   # Upper 16 bit of 32-bit instruction
+addi s0, s0, 2                  # Go to the next half-word
 slli s3, s3, 16                 # Upper 16 bit
 or s1, s1, s3                   # Now the whole 32-bit instruction is in the register
 # putting 32-bit instruction into memory
