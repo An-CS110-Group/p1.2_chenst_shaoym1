@@ -94,7 +94,24 @@ mul t1, t0, s9                  # t1 is the relative address of current instruct
 add t1, t1, s11                 # Now t1 is the absolute address of current instruction
 addi t0, t0, 1                  # t0 += 1; t0 should not be used until next loop
 lw t2, 0(t1)                    # originalValue is loaded into t2
+andi t3, t2, 0b1111111          # opcode
+sw t3, 4(t1)                    # opcode
+srli t3, t2, 7                  # rd
+andi t3, t3, 0b11111            # rd
+sw t3, 8(t1)                    # rd
+srli t3, t2, 12                 # funct3
+andi t3, t3, 0b111              # funct3
+sw t3, 12(t1)                   # funct3
+srli t3, t2, 15                 # rs1
+andi t3, t3, 0b11111            # rs1
+sw t3, 16(t1)                   # rs1
+srli t3, t2, 20                 # rs2
+andi t3, t3, 0b11111            # rs2
+sw t3, 20(t1)                   # rs2
+srli t3, t2, 25                 # funct7
+sw t3, 24(t1)                   # funct7
 
+# TODO: imm
 
 j parse_main_loop               # Go back to loop
 finish_parse:
