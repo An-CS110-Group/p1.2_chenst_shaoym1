@@ -87,7 +87,17 @@ j read_next                     # Go back to loop
 finish_reading:
 
 # parse all 32-bit instructions here
-add zero, zero, zero
+li t0, 0                        # t0 is the number of instruction we are dealing with
+parse_main_loop:
+beq t0, s7, finish_parse        # if (t0 == s7) finish
+mul t1, t0, s9                  # t1 is the relative address of current instruction
+add t1, t1, s11                 # Now t1 is the absolute address of current instruction
+addi t0, t0, 1                  # t0 += 1; t0 should not be used until next loop
+lw t2, 0(t1)                    # originalValue is loaded into t2
+
+
+j parse_main_loop               # Go back to loop
+finish_parse:
 
 # parse all compressed instructions
 li t0, 0                        # t0 is the number of (compressed) instruction we are dealing with
