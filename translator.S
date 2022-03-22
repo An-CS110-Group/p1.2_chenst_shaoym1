@@ -770,17 +770,69 @@ sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_R:
+lw t3, 8(t1)                    # load rd
+slli t3, t3, 7                  # load rd
+or t2, t2, t3                   # load rd
+lw t3, 16(t1)                   # load funct3 
+slli t3, t3, 12                 # load funct3
+or t2, t2, t3                   # load funct3
+lw t3, 16(t1)                   # load rs1
+slli t3, t3, 15                 # load rs1
+or t2, t2, t3                   # load rs1
+lw t3, 20(t1)                   # load rs2
+slli t3, t3, 20                 # load rs2
+or t2, t2, t3                   # load rs2
+lw t3, 24(t1)                   # load funct7
+slli t3, t3, 25                 # load funct7
+or t2, t2, t3                   # load funct7
+sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_U:
+lw t3, 8(t1)                    # load rd
+slli t3, t3, 7                  # load rd
+or t2, t2, t3                   # load rd
+lw t3, 28(t1)                   # load imm
+slli t3, t3, 12                 # load imm
+or t2, t2, t3                   # load imm
+sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_S:
+lw t3, 12(t1)                   # load funct3
+slli t3, t3, 12                 # load funct3
+or t2, t2, t3                   # load funct3
+lw t3, 16(t1)                   # load rs1
+slli t3, t3, 15                 # load rs1
+or t2, t2, t3                   # load rs1
+lw t3, 20(t1)                   # load rs2
+slli t3, t3, 20                 # load rs2
+or t2, t2, t3                   # load rs2
+lw t3, 28(t1)                   # imm
+addi t4, t3, 0b11111            # load[4:0]
+slli t4, t4, 7                  # load[4:0]
+or t2, t2, t4                   # load[4:0]
+srli t4, t3, 5                  # load[11:5]
+slli t4, t4, 25                 # load[11:5]
+or t2, t2, t4                   # load[11:5]
+sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_I:
+lw t3, 8(t1)                    # load rd
+slli t3, t3, 7                  # load rd
+or t2, t2, t3                   # load rd
+lw t3, 16(t1)                   # load funct3 
+slli t3, t3, 12                 # load funct3
+or t2, t2, t3                   # load funct3
+lw t3, 16(t1)                   # load rs1
+slli t3, t3, 15                 # load rs1
+or t2, t2, t3                   # load rs1
+lw t3, 28(t1)                   # load imm
+slli t3, t3, 20                 # load imm
+or t2, t2, t3                   # load imm
+sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
-
 
 j write_origin_loop             # Should not reach here!
 end_write_ori:
