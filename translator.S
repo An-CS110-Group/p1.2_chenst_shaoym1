@@ -11,31 +11,6 @@
 
 # Your code to convert the RVC codes to RVI codes.
 
-.data
-
-# Constant integer specifying the lines of RVC codes
-
-# DO NOT MODIFY THIS VARIABLE
-.globl lines_of_rvc_codes
-lines_of_rvc_codes:
-    .word 7
-
-
-# RVC codes, 16-bits instructions mixed with 32-bits instructions
-# A 16/32-bits binary number represents one line of rvc code.
-# You can suppose all of the input codes are valid. 
-
-# DO NOT MODIFY THIS VARIABLE
-.globl rvc_codes
-rvc_codes:
-    .word 0b00000000000000000000001010110011
-    .half 0b0001010111111101
-    .half 0b1001001010101010
-    .half 0b0001010111111101
-    .word 0b11111110000001011101111011100011
-    .half 0b1000010100010110
-    .half 0b1000000010000010
-
 .text
 # The total line of code
 lw s7, lines_of_rvc_codes
@@ -144,6 +119,8 @@ or s2, s2, t5                   # [19:12]
 srli t5, t2, 31                 # [20]
 slli t5, t5, 19                 # [20]
 or s2, s2, t5                   # [20]
+slli s2, s2, 12                 # sign-extend
+srai s2, s2, 12                 # sign-extend
 sw s2, 28(t1)                   # save imm
 j parse_main_loop
 
@@ -163,30 +140,42 @@ or s2, s2, t5                   # [11]
 srli t5, t2, 31                 # [12]
 slli t5, t5, 11                 # [12]
 or s2, s2, t5                   # [12]
+slli s2, s2, 20                 # sign-extend
+srai s2, s2, 20                 # sign-extend
 sw s2, 28(t1)                   # save imm
 j parse_main_loop
 
 parse_R:
 li s2, 0                        # s2 is the result
-
-sw s2, 28(t1)                   # save imm
+sw s2, 28(t1)                   # save imm (always zero)
 j parse_main_loop
 
 parse_U:
 li s2, 0                        # s2 is the result
-
+srli s2, t2, 12                 # [31:12]
+slli s2, s2, 12                 # sign-extend
+srai s2, s2, 12                 # sign-extend
 sw s2, 28(t1)                   # save imm
 j parse_main_loop
 
 parse_S:
 li s2, 0                        # s2 is the result
-
+srli t5, t2, 7                  # [4:0]
+andi t5, t5, 0b11111            # [4:0]
+or s2, s2, t5                   # [4:0]
+srli t5, t2, 25                 # [11:5]
+slli t5, t5, 5                  # [11:5]
+or s2, s2, t5                   # [11:5]
+slli s2, s2, 20                 # sign-extend
+srai s2, s2, 20                 # sign-extend
 sw s2, 28(t1)                   # save imm
 j parse_main_loop
 
 parse_I:
 li s2, 0                        # s2 is the result
-
+srli s2, t2, 20                 # [11:0]
+slli s2, s2, 20                 # sign-extend
+srai s2, s2, 20                 # sign-extend
 sw s2, 28(t1)                   # save imm
 j parse_main_loop
 
