@@ -264,10 +264,10 @@ add t1, t1, s10                 # t1 is the position of current 16-bit instructi
 mul t2, t0, s9                  # relative address of 32-bit instruction
 add t2, t2, s11                 # t2 is the position of current 32-bit instruction
 addi t0, t0, 1                  # t0 += 1
-lw t3, 0(t2)                    # t3 = originalValue
+lw t3, 0(t1)                    # t3 = originalValue
 beqz t3, expand_main_loop       # if (compressed[i] == NULL) continue;
-lbu t4, 13(t2)                  # t4 = opcode
-lbu t5, 5(t2)                   # t5 = funct3
+lbu t4, 13(t1)                  # t4 = opcode
+lbu t5, 5(t1)                   # t5 = funct3
 beqz t5, expand_00              # opcode = 0b00
 li t6, 0b10                     # opcode = 0b10
 beq t5, t6, expand_10           # opcode = 0b10
@@ -278,12 +278,36 @@ li t6, 0b010                    # LW: funct3 = 0b010
 beq t5, t6, ex_LW               # LW: funct3 = 0b010
 j ex_SW                         # SW: other conditions
 
-ex_LW:
-# TODO: LW
+ex_LW:                          # LW: immediate is not negative
+li t3, 0b010                    # funct3 = 0b010
+sw t3, 12(t2)                   # save funct3
+li t3, 0b0000011                # opcode = 0b0000011
+sw t3, 4(t2)                    # save opcode
+lbu t3, 10(t1)                  # t3 = rs1' (compressed)
+addi t3, t3, 0b1000             # t3 = rs1 (32-bit)
+sw t3, 16(t2)                   # save rs1
+lbu t3, 12(t1)                  # t3 = rd' (compressed)
+addi t3, t3, 0b1000             # t3 = rd (32-bit)
+sw t3, 8(t2)                    # save rd
+lw t3, 16(t1)                   # 16-bit imm
+slli t3, t3, 2                  # get 32-bit imm
+sw t3, 28(t2)                   # save imm
 j expand_next
 
-ex_SW:
-# TODO: SW
+ex_SW:                          # SW: immediate is not negative
+li t3, 0b010                    # funct3 = 0b010
+sw t3, 12(t2)                   # save funct3
+li t3, 0b0100011                # opcode = 0b0100011
+sw t3, 4(t2)                    # save opcode
+lbu t3, 10(t1)                  # t3 = rs1' (compressed)
+addi t3, t3, 0b1000             # t3 = rs1 (32-bit)
+sw t3, 16(t2)                   # save rs1
+lbu t3, 11(t1)                  # t3 = rs2' (compressed)
+addi t3, t3, 0b1000             # t3 = rs2 (32-bit)
+sw t3, 20(t2)                   # save rs2
+lw t3, 16(t1)                   # 16-bit imm
+slli t3, t3, 2                  # get 32-bit imm
+sw t3, 28(t2)                   # save imm
 j expand_next
 
 expand_10:
@@ -295,8 +319,18 @@ li t6, 0b1000                   # MV: funct4 = 0b1000
 beq a3, t6, ex_MV               # MV: funct4 = 0b1000
 j ex_ADD                        # ADD: other conditions
 
-ex_SLLI:
-# TODO: SLLI
+ex_SLLI:                        # SLLI: shamt[5] = 0
+li t3, 0b001                    # funct3 = 0b001
+sw t3, 12(t2)                   # store funct3
+li t3, 0b0010011                # opcode = 0b0010011
+sw t3, 4(t2)                    # store opcode
+li t3, 0b0000000                # funct7 = 0b0000000
+sw t3, 24(t2)                   # store funct7
+lbu t3, 8(t1)                   # t3 = rd/rs1
+sw t3, 16(t2)                   # store rs1
+sw t3, 8(t2)                    # store rd
+lw t3, 16(t1)                   # t3 = imm
+sw t3, 28(t2)                   # store imm
 j expand_next
 
 ex_JR_JALR:
@@ -305,24 +339,62 @@ beq a3, t6, ex_JR               # JR: funct4 = 0b1000
 j ex_JALR                       # JALR: other cases
 
 ex_JR:
-# TODO: JR
+li t3, 0b000                    # funct3 = 0b000
+sw t3, 12(t2)                   # store funct3
+li t3, 0b1100111                # opcode = 0b1100111
+sw t3, 4(t2)                    # store opcode
+li t3, 0                        # rd = 0
+sw t3, 8(t2)                    # store rd
+li t3, 0                        # imm = 0
+sw t3, 28(t2)                   # store imm
+lbu t3, 8(t2)                   # t2 = rs1
+sw t3, 16(t2)                   # store rs1
 j expand_next
 
 ex_JALR:
-# TODO: JALR
+li t3, 0b000                    # funct3 = 0b000
+sw t3, 12(t2)                   # store funct3
+li t3, 0b1100111                # opcode = 0b1100111
+sw t3, 4(t2)                    # store opcode
+li t3, 1                        # rd = 1
+sw t3, 8(t2)                    # store rd
+li t3, 0                        # imm = 0
+sw t3, 28(t2)                   # store imm
+lbu t3, 8(t2)                   # t2 = rs1
+sw t3, 16(t2)                   # store rs1
 j expand_next
 
 ex_MV:
-# TODO: MV
+li t3, 0b0000000                # funct7 = 0b0000000
+sw t3, 24(t2)                   # store funct7
+li t3, 0b000                    # funct3 = 0b000
+sw t3, 12(t2)                   # store funct3
+li t3, 0b0110011                # opcode = 0b0110011
+sw t3, 4(t2)                    # store opcode
+lbu t3, 8(t1)                   # t3 = rd/rs1
+sw t3, 8(t2)                    # store rd
+lbu t3, 9(t2)                   # t3 = rs2
+sw t3, 20(t2)                   # store rs2
+li t3, 0                        # rs1 = 0
+sw t3, 16(t2)                   # store rs1
 j expand_next
 
 ex_ADD:
-# TODO: ADD
+li t3, 0b0000000                # funct7 = 0b0000000
+sw t3, 24(t2)                   # store funct7
+li t3, 0b000                    # funct3 = 0b000
+sw t3, 12(t2)                   # store funct3
+li t3, 0b0110011                # opcode = 0b0110011
+sw t3, 4(t2)                    # store opcode
+lbu t3, 8(t1)                   # t3 = rd/rs1
+sw t3, 8(t2)                    # store rd
+sw t3, 16(t2)                   # store rs1
+lbu t3, 9(t2)                   # t3 = rs2
+sw t3, 20(t2)                   # store rs2
 j expand_next
 
 
 expand_01:
-# TODO: all other instructions
 li t6, 0b010                    # LI: funct3 = 0b010
 beq t5, t6, ex_LI               # LI: funct3 = 0b010
 li t6, 0b011                    # LUI: funct3 = 0b011
@@ -356,7 +428,19 @@ beq a5, t6, ex_AND              # AND: funct2 = 0b11
 j expand_next                   # This line should not be executed
 
 ex_AND:
-# TODO: AND
+li t3, 0b0000000                # funct7 = 0b0000000
+sw t3, 24(t2)                   # store funct7
+li t3, 0b111                    # funct3 = 0b111
+sw t3, 12(t2)                   # store funct3
+li t3, 0b0110011                # opcode = 0b0110011
+sw t3, 4(t2)                    # store opcode
+lbu t3, 12(t1)                  # t3 = rd' (compressed)
+addi t3, t3, 0b1000             # t3 = rd (32-bit)
+sw t3, 8(t2)                    # store rd
+sw t3, 16(t2)                   # store rs1
+lbu t3, 11(t1)                  # t3 = rs2' (compressed)
+addi t3, t3, 0b1000             # t3 = rs2 (32-bit)
+sw t3, 20(t2)                   # store rs2
 j expand_next
 
 ex_OR:
