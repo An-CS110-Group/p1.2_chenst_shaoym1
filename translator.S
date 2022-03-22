@@ -322,7 +322,48 @@ j expand_next
 
 expand_01:
 # TODO: all other instructions
+li t6, 0b010                    # LI: funct3 = 0b010
+beq t5, t6, ex_LI               # LI: funct3 = 0b010
+li t6, 0b011                    # LUI: funct3 = 0b011
+beq t5, t6, ex_LUI              # LUI: funct3 = 0b011
+beqz t5, ex_ADDI                # ADDI: funct3 = 0b000
+li t6, 0b110                    # BEQZ: funct3 = 0b110
+beq t5, t6, ex_BEQZ             # BEQZ: funct3 = 0b110
+li t6, 0b111                    # BNEZ: funct3 = 0b111
+beq t5, t6, ex_BNEZ             # BNEZ: funct3 = 0b111
+li t6, 0b101                    # J: funct3 = 0b101
+beq t5, t6, ex_J                # J: funct3 = 0b101
+li t6, 0b001                    # JAL: funct3 = 0b001
+beq t5, t6, ex_JAL              # JAL: funct3 = 0b001
+# TODO: AND/OR/XOR/SUB/SRLI/SRAI
 
+ex_LI:
+# TODO: LI
+j expand_next
+
+ex_LUI:
+# TODO: LUI
+j expand_next
+
+ex_ADDI:
+# TODO: ADDI
+j expand_next
+
+ex_BEQZ:
+# TODO: BEQZ
+j expand_next
+
+ex_BNEZ:
+# TODO: BNEZ
+j expand_next
+
+ex_J:
+# TODO: J
+j expand_next
+
+ex_JAL:
+# TODO: JAL
+j expand_next
 
 
 expand_next:
