@@ -741,6 +741,32 @@ sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_SB:
+lw t3, 12(t1)                   # load funct3
+slli t3, t3, 12                 # load funct3
+or t2, t2, t3                   # load funct3
+lw t3, 16(t1)                   # load rs1
+slli t3, t3, 15                 # load rs1
+or t2, t2, t3                   # load rs1
+lw t3, 20(t1)                   # load rs2
+slli t3, t3, 20                 # load rs2
+or t2, t2, t3                   # load rs2
+lw t3, 28(t1)                   # imm
+andi t4, t3, 0b1111             # load [4:1]
+slli t4, t4, 8                  # load [4:1]
+or t2, t2, t4                   # load [4:1]
+srli t4, t3, 4                  # load [10:5]
+andi t4, t4, 0b111111           # load [10:5]
+slli t4, t4, 25                 # load [10:5]
+or t2, t2, t4                   # load [10:5]
+srli t4, t3, 10                 # load [11]
+andi t4, t4, 1                  # load [11]
+slli t4, t4, 7                  # load [11]
+or t2, t2, t4                   # load [11]
+srli t4, t3, 11                 # load [12]
+andi t4, t4, 1                  # load [12]
+slli t4, t4, 31                 # load [12]
+or t2, t2, t4                   # load [12]
+sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_R:
