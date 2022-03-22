@@ -694,7 +694,51 @@ j update_main_loop              # Go back to loop
 end_update:
 
 # write "originalValue" field for instructions
-add zero, zero, zero
+li t0, 0                        # t0 is the number if instruction we are dealing with
+write_origin_loop:
+beq t0, s7, end_write_ori       # if (t0 == s7) finish
+mul t1, t0, s9                  # relative address of 32-bit instruction
+add t1, t1, s11                 # t1 is the position of current 32-bit instruction
+addi t0, t0, 1                  # t0 += 1
+lw t2, 4(t1)                    # t2 = opcode (32-bit)
+li t3, 0x6F                     # UJ
+beq t2, t3, write_UJ            # UJ
+li t3, 0x63                     # SB
+beq t2, t3, write_SB            # SB
+li t3, 0x3B                     # R
+beq t2, t3, write_R             # R
+li t3, 0x33                     # R
+beq t2, t3, write_R             # R
+li t3, 0x37                     # U
+beq t2, t3, write_U             # U
+li t3, 0x17                     # U
+beq t2, t3, write_U             # U
+li t3, 0x23                     # S
+beq t2, t3, write_S             # S
+j write_I                       # I
+
+write_UJ:
+j write_origin_loop
+
+write_SB:
+j write_origin_loop
+
+write_R:
+j write_origin_loop
+
+write_U:
+j write_origin_loop
+
+write_S:
+j write_origin_loop
+
+write_I:
+j write_origin_loop
+
+
+j write_origin_loop             # Should not reach here!
+end_write_ori:
+
 
 # print to file
 li t0, 0                        # t0 stands for current position
