@@ -444,23 +444,81 @@ sw t3, 20(t2)                   # store rs2
 j expand_next
 
 ex_OR:
-# TODO: OR
+li t3, 0b0000000                # funct7 = 0b0000000
+sw t3, 24(t2)                   # store funct7
+li t3, 0b110                    # funct3 = 0b110
+sw t3, 12(t2)                   # store funct3
+li t3, 0b0110011                # opcode = 0b0110011
+sw t3, 4(t2)                    # store opcode
+lbu t3, 12(t1)                  # t3 = rd' (compressed)
+addi t3, t3, 0b1000             # t3 = rd (32-bit)
+sw t3, 8(t2)                    # store rd
+sw t3, 16(t2)                   # store rs1
+lbu t3, 11(t1)                  # t3 = rs2' (compressed)
+addi t3, t3, 0b1000             # t3 = rs2 (32-bit)
+sw t3, 20(t2)                   # store rs2
 j expand_next
 
 ex_XOR:
-# TODO: XOR
+li t3, 0b0000000                # funct7 = 0b0000000
+sw t3, 24(t2)                   # store funct7
+li t3, 0b100                    # funct3 = 0b100
+sw t3, 12(t2)                   # store funct3
+li t3, 0b0110011                # opcode = 0b0110011
+sw t3, 4(t2)                    # store opcode
+lbu t3, 12(t1)                  # t3 = rd' (compressed)
+addi t3, t3, 0b1000             # t3 = rd (32-bit)
+sw t3, 8(t2)                    # store rd
+sw t3, 16(t2)                   # store rs1
+lbu t3, 11(t1)                  # t3 = rs2' (compressed)
+addi t3, t3, 0b1000             # t3 = rs2 (32-bit)
+sw t3, 20(t2)                   # store rs2
 j expand_next
 
 ex_SUB:
-# TODO: SUB
+li t3, 0b0100000                # funct7 = 0b0100000
+sw t3, 24(t2)                   # store funct7
+li t3, 0b111                    # funct3 = 0b111
+sw t3, 12(t2)                   # store funct3
+li t3, 0b0110011                # opcode = 0b0110011
+sw t3, 4(t2)                    # store opcode
+lbu t3, 12(t1)                  # t3 = rd' (compressed)
+addi t3, t3, 0b1000             # t3 = rd (32-bit)
+sw t3, 8(t2)                    # store rd
+sw t3, 16(t2)                   # store rs1
+lbu t3, 11(t1)                  # t3 = rs2' (compressed)
+addi t3, t3, 0b1000             # t3 = rs2 (32-bit)
+sw t3, 20(t2)                   # store rs2
 j expand_next
 
 ex_SRLI:
-# TODO: SRLI
+li t3, 0b101                    # funct3 = 0b101
+sw t3, 12(t2)                   # store funct3
+li t3, 0b0010011                # opcode = 0b0010011
+sw t3, 4(t2)                    # store opcode
+li t3, 0b0000000                # funct7 = 0b0000000
+sw t3, 24(t2)                   # store funct7
+lbu t3, 12(t1)                  # t3 = rd'/rs1' (compressed)
+addi t3, t3, 0b1000             # t3 = rd/rs1 (32-bit)
+sw t3, 8(t2)                    # store rd
+sw t3, 16(t2)                   # store rs1
+lw t3, 16(t1)                   # t3 = shamt
+sw t3, 28(t2)                   # store imm
 j expand_next
 
 ex_SRAI:
-# TODO: SRAI
+li t3, 0b101                    # funct3 = 0b101
+sw t3, 12(t2)                   # store funct3
+li t3, 0b0010011                # opcode = 0b0010011
+sw t3, 4(t2)                    # store opcode
+li t3, 0b0100000                # funct7 = 0b0100000
+sw t3, 24(t2)                   # store funct7
+lbu t3, 12(t1)                  # t3 = rd'/rs1' (compressed)
+addi t3, t3, 0b1000             # t3 = rd/rs1 (32-bit)
+sw t3, 8(t2)                    # store rd
+sw t3, 16(t2)                   # store rs1
+lw t3, 16(t1)                   # t3 = shamt
+sw t3, 28(t2)                   # store imm
 j expand_next
 
 ex_ANDI:
