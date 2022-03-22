@@ -718,6 +718,26 @@ beq t2, t3, write_S             # S
 j write_I                       # I
 
 write_UJ:
+lw t3, 8(t1)                    # load rd
+slli t3, t3, 7                  # load rd
+or t2, t2, t3                   # load rd
+lw t3, 28(t1)                   # imm
+andi t4, t3, 0b1111111111       # load [10:1]
+slli t4, t4, 21                 # load [10:1]
+or t2, t2, t4                   # load [10:1]
+srli t4, t3, 10                 # load [11]
+andi t4, t4, 1                  # load [11]
+slli t4, t4, 20                 # load [11]
+or t2, t2, t4                   # load [11]
+srli t4, t3, 12                 # load [19:12]
+andi t4, t4, 0b11111111         # load [19:12]
+slli t4, t4, 12                 # load [19:12]
+or t2, t2, t4                   # load [19:12]
+srli t4, t3, 19                 # load [20]
+andi t4, t4, 1                  # load [20]
+slli t4, t4, 31                 # load [20]
+or t2, t2, t4                   # load [20]
+sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_SB:
