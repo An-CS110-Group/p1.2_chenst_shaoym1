@@ -274,10 +274,51 @@ beq t5, t6, expand_10           # opcode = 0b10
 j expand_01                     # opcode = 0b01
 
 expand_00:
-# TODO: LW/SW
+li t6, 0b010                    # LW: funct3 = 0b010
+beq t5, t6, ex_LW               # LW: funct3 = 0b010
+j ex_SW                         # SW: other conditions
+# TODO: LW
+ex_LW:
+j expand_next
+# TODO: SW
+ex_SW:
+j expand_next
 
 expand_10:
-# TODO: SLLI/JR/JALR/MV/ADD
+beqz t5, ex_SLLI                # SLLI: funct3 = 0b000
+
+# TODO: SLLI
+ex_SLLI:
+j expand_next
+
+lbu a2, 9(t1)                   # a2 = rs2
+lbu a3, 4(t1)                   # a3 = funct4
+beqz a2, ex_JR_JALR             # JR/JALR
+li t6, 0b1000                   # MV: funct4 = 0b1000
+beq a3, t6, ex_MV               # MV: funct4 = 0b1000
+j ex_ADD                        # ADD: other conditions
+
+ex_JR_JALR:
+li t6, 0b1000                   # JR: funct4 = 0b1000
+beq a3, t6, ex_JR               # JR: funct4 = 0b1000
+j ex_JALR                       # JALR: other cases
+
+ex_JR:
+# TODO: JR
+j expand_next
+
+ex_JALR:
+# TODO: JALR
+j expand_next
+
+ex_MV:
+# TODO: MV
+j expand_next
+
+ex_ADD:
+# TODO: ADD
+j expand_next
+
 
 expand_01:
 # TODO: all other instructions
