@@ -91,10 +91,10 @@ add zero, zero, zero
 
 # parse all compressed instructions
 li t0, 0                        # t0 is the number of (compressed) instruction we are dealing with
-mul t1, t0, s8                  # t1 is the relative address of current instruction
-add t1, t1, s10                 # Now t1 is the absolute address of current instruction
 parse_CI_main_loop:
 beq t0, s7, finish_parse_CI     # if (t0 == s7) finish
+mul t1, t0, s8                  # t1 is the relative address of current instruction
+add t1, t1, s10                 # Now t1 is the absolute address of current instruction
 addi t0, t0, 1                  # t0 += 1; t0 should not be used until next loop
 lw t2, 0(t1)                    # originalValue is loaded into t2
 beqz t2, parse_CI_main_loop     # if (compressed[i] == NULL) continue;
@@ -120,7 +120,7 @@ andi t3, t3, 0b11111            # rd/rs1 = (ov >> 7) & 0b11111
 sb t3, 8(t1)                    # store rd/rs1 to memory
 srli t3, t2, 2                  # rs2 = (ov >> 2) & 0b11111
 andi t3, t3, 0b11111            # rs2 = (ov >> 2) & 0b11111
-sb t3, 9(t1)                    # store rd/rs1 to memory
+sb t3, 9(t1)                    # store rs2 to memory
 srli t3, t2, 7                  # rs1' = (ov >> 7) & 0b111
 andi t3, t3, 0b111              # rs1' = (ov >> 7) & 0b111
 sb t3, 10(t1)                   # store rs1' to memory
@@ -268,9 +268,9 @@ lw t3, 0(t1)                    # t3 = originalValue
 beqz t3, expand_main_loop       # if (compressed[i] == NULL) continue;
 lbu t4, 13(t1)                  # t4 = opcode
 lbu t5, 5(t1)                   # t5 = funct3
-beqz t5, expand_00              # opcode = 0b00
+beqz t4, expand_00              # opcode = 0b00
 li t6, 0b10                     # opcode = 0b10
-beq t5, t6, expand_10           # opcode = 0b10
+beq t4, t6, expand_10           # opcode = 0b10
 j expand_01                     # opcode = 0b01
 
 expand_00:
@@ -347,7 +347,7 @@ li t3, 0                        # rd = 0
 sw t3, 8(t2)                    # store rd
 li t3, 0                        # imm = 0
 sw t3, 28(t2)                   # store imm
-lbu t3, 8(t2)                   # t2 = rs1
+lbu t3, 8(t1)                   # t3 = rs1
 sw t3, 16(t2)                   # store rs1
 j expand_next
 
@@ -360,7 +360,7 @@ li t3, 1                        # rd = 1
 sw t3, 8(t2)                    # store rd
 li t3, 0                        # imm = 0
 sw t3, 28(t2)                   # store imm
-lbu t3, 8(t2)                   # t2 = rs1
+lbu t3, 8(t1)                   # t2 = rs1
 sw t3, 16(t2)                   # store rs1
 j expand_next
 
@@ -373,7 +373,7 @@ li t3, 0b0110011                # opcode = 0b0110011
 sw t3, 4(t2)                    # store opcode
 lbu t3, 8(t1)                   # t3 = rd/rs1
 sw t3, 8(t2)                    # store rd
-lbu t3, 9(t2)                   # t3 = rs2
+lbu t3, 9(t1)                   # t3 = rs2
 sw t3, 20(t2)                   # store rs2
 li t3, 0                        # rs1 = 0
 sw t3, 16(t2)                   # store rs1
@@ -389,7 +389,7 @@ sw t3, 4(t2)                    # store opcode
 lbu t3, 8(t1)                   # t3 = rd/rs1
 sw t3, 8(t2)                    # store rd
 sw t3, 16(t2)                   # store rs1
-lbu t3, 9(t2)                   # t3 = rs2
+lbu t3, 9(t1)                   # t3 = rs2
 sw t3, 20(t2)                   # store rs2
 j expand_next
 
@@ -541,8 +541,7 @@ li t3, 0b000                    # funct3 = 0b000
 sw t3, 12(t2)                   # store funct3
 li t3, 0b0010011                # opcode = 0b0010011
 sw t3, 4(t2)                    # store opcode
-lbu t3, 12(t1)                  # t3 = rd'/rs1' (compressed)
-addi t3, t3, 0b1000             # t3 = rd (32-bit)
+lbu t3, 8(t1)                   # t3 = rd/rs1
 sw t3, 8(t2)                    # store rd
 li t3, 0                        # rs1 = 0
 sw t3, 16(t2)                   # store rs1
@@ -568,8 +567,7 @@ li t3, 0b000                    # funct3 = 0b000
 sw t3, 12(t2)                   # store funct3
 li t3, 0b0010011                # opcode = 0b0010011
 sw t3, 4(t2)                    # store opcode
-lbu t3, 12(t1)                  # t3 = rd'/rs1' (compressed)
-addi t3, t3, 0b1000             # t3 = rd/rs1 (32-bit)
+lbu t3, 8(t1)                   # t3 = rd/rs1
 sw t3, 8(t2)                    # store rd
 sw t3, 16(t2)                   # store rs1
 lw t3, 16(t1)                   # t3 = imm
@@ -773,7 +771,7 @@ write_R:
 lw t3, 8(t1)                    # load rd
 slli t3, t3, 7                  # load rd
 or t2, t2, t3                   # load rd
-lw t3, 16(t1)                   # load funct3 
+lw t3, 12(t1)                   # load funct3 
 slli t3, t3, 12                 # load funct3
 or t2, t2, t3                   # load funct3
 lw t3, 16(t1)                   # load rs1
@@ -822,7 +820,7 @@ write_I:
 lw t3, 8(t1)                    # load rd
 slli t3, t3, 7                  # load rd
 or t2, t2, t3                   # load rd
-lw t3, 16(t1)                   # load funct3 
+lw t3, 12(t1)                   # load funct3 
 slli t3, t3, 12                 # load funct3
 or t2, t2, t3                   # load funct3
 lw t3, 16(t1)                   # load rs1
