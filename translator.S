@@ -256,7 +256,38 @@ j parse_CI_main_loop
 finish_parse_CI:
 
 # expand all compressed instructions
-add zero, zero, zero
+li t0, 0                        # t0 is the number if instruction we are dealing with
+expand_main_loop:
+beq t0, s7, end_expand          # if (t0 == s7) finish
+mul t1, t0, s8                  # relative address of compressed instruction
+add t1, t1, s10                 # t1 is the position of current 16-bit instruction
+mul t2, t0, s9                  # relative address of 32-bit instruction
+add t2, t2, s11                 # t2 is the position of current 32-bit instruction
+addi t0, t0, 1                  # t0 += 1
+lw t3, 0(t2)                    # t3 = originalValue
+beqz t3, expand_main_loop       # if (compressed[i] == NULL) continue;
+lbu t4, 13(t2)                  # t4 = opcode
+lbu t5, 5(t2)                   # t5 = funct3
+beqz t5, expand_00              # opcode = 0b00
+li t6, 0b10                     # opcode = 0b10
+beq t5, t6, expand_10           # opcode = 0b10
+j expand_01                     # opcode = 0b01
+
+expand_00:
+# TODO: LW/SW
+
+expand_10:
+# TODO: SLLI/JR/JALR/MV/ADD
+
+expand_01:
+# TODO: all other instructions
+
+
+
+expand_next:
+j expand_main_loop              # Go to next instruction
+
+end_expand:
 
 # update all addresses
 add zero, zero, zero
