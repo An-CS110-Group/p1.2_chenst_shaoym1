@@ -277,26 +277,27 @@ expand_00:
 li t6, 0b010                    # LW: funct3 = 0b010
 beq t5, t6, ex_LW               # LW: funct3 = 0b010
 j ex_SW                         # SW: other conditions
-# TODO: LW
+
 ex_LW:
+# TODO: LW
 j expand_next
-# TODO: SW
+
 ex_SW:
+# TODO: SW
 j expand_next
 
 expand_10:
 beqz t5, ex_SLLI                # SLLI: funct3 = 0b000
-
-# TODO: SLLI
-ex_SLLI:
-j expand_next
-
 lbu a2, 9(t1)                   # a2 = rs2
 lbu a3, 4(t1)                   # a3 = funct4
 beqz a2, ex_JR_JALR             # JR/JALR
 li t6, 0b1000                   # MV: funct4 = 0b1000
 beq a3, t6, ex_MV               # MV: funct4 = 0b1000
 j ex_ADD                        # ADD: other conditions
+
+ex_SLLI:
+# TODO: SLLI
+j expand_next
 
 ex_JR_JALR:
 li t6, 0b1000                   # JR: funct4 = 0b1000
@@ -335,7 +336,52 @@ li t6, 0b101                    # J: funct3 = 0b101
 beq t5, t6, ex_J                # J: funct3 = 0b101
 li t6, 0b001                    # JAL: funct3 = 0b001
 beq t5, t6, ex_JAL              # JAL: funct3 = 0b001
-# TODO: AND/OR/XOR/SUB/SRLI/SRAI
+# Depend on funct6
+lbu a4, 6(t1)                   # a4 = funct6 & 0b11
+andi a4, a4, 0b11               # a4 = funct6 & 0b11
+beqz a4, ex_SRLI                # SRLI: last two digits of funct6 is 00
+li t6, 0b01                     # SRAI: last two digits of funct6 is 01
+beq a4, t6, ex_SRAI             # SRAI: last two digits of funct6 is 01
+li t6, 0b10                     # ANDI: last two digits of funct6 is 10
+beq a4, t6, ex_ANDI             # ANDI: last two digits of funct6 is 10
+# Depend on funct2
+lbu a5, 7(t1)                   # a5 = funct2
+beqz a5, ex_SUB                 # SUB: funct2 = 0b00
+li t6, 0b01                     # XOR: funct2 = 0b01
+beq a5, t6, ex_XOR              # XOR: funct2 = 0b01
+li t6, 0b10                     # OR: funct2 = 0b10
+beq a5, t6, ex_OR               # OR: funct2 = 0b10
+li t6, 0b11                     # AND: funct2 = 0b11
+beq a5, t6, ex_AND              # AND: funct2 = 0b11
+j expand_next                   # This line should not be executed
+
+ex_AND:
+# TODO: AND
+j expand_next
+
+ex_OR:
+# TODO: OR
+j expand_next
+
+ex_XOR:
+# TODO: XOR
+j expand_next
+
+ex_SUB:
+# TODO: SUB
+j expand_next
+
+ex_SRLI:
+# TODO: SRLI
+j expand_next
+
+ex_SRAI:
+# TODO: SRAI
+j expand_next
+
+ex_ANDI:
+# TODO: ANDI
+j expand_next
 
 ex_LI:
 # TODO: LI
