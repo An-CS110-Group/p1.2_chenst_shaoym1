@@ -111,9 +111,68 @@ sw t3, 20(t1)                   # rs2
 srli t3, t2, 25                 # funct7
 sw t3, 24(t1)                   # funct7
 
-# TODO: imm
+lw t4, 4(t1)                    # t4 = opcode
+li t3, 0x6F                     # UJ
+beq t4, t3, parse_UJ            # UJ
+li t3, 0x63                     # SB
+beq t4, t3, parse_SB            # SB
+li t3, 0x3B                     # R
+beq t4, t3, parse_R             # R
+li t3, 0x33                     # R
+beq t4, t3, parse_R             # R
+li t3, 0x37                     # U
+beq t4, t3, parse_U             # U
+li t3, 0x17                     # U
+beq t4, t3, parse_U             # U
+li t3, 0x23                     # S
+beq t4, t3, parse_S             # S
+j parse_I                       # I
 
-j parse_main_loop               # Go back to loop
+parse_UJ:
+li s2, 0                        # s2 is the result
+srli t5, t2, 21                 # [10:1]
+andi t5, t5, 0b1111111111       # [10:1]
+or s2, s2, t5                   # [10:1]
+srli t5, t2, 20                 # [11]
+andi t5, t5, 1                  # [11]
+slli t5, t5, 10                 # [11]
+or s2, s2, t5                   # [11]
+srli t5, t2, 12                 # [19:12]
+andi t5, t5, 0b11111111         # [19:12]
+slli t5, t5, 11                 # [19:12]
+or s2, s2, t5                   # [19:12]
+srli t5, t2, 31                 # [20]
+slli t5, t5, 19                 # [20]
+or s2, s2, t5                   # [20]
+sw s2, 28(t1)
+j parse_main_loop
+
+parse_SB:
+li s2, 0                        # s2 is the result
+lw t3, 28(t1)                   # imm
+j parse_main_loop
+
+parse_R:
+li s2, 0                        # s2 is the result
+lw t3, 28(t1)                   # imm
+j parse_main_loop
+
+parse_U:
+li s2, 0                        # s2 is the result
+lw t3, 28(t1)                   # imm
+j parse_main_loop
+
+parse_S:
+li s2, 0                        # s2 is the result
+lw t3, 28(t1)                   # imm
+j parse_main_loop
+
+parse_I:
+li s2, 0                        # s2 is the result
+lw t3, 28(t1)                   # imm
+j parse_main_loop
+
+j parse_main_loop               # Should never reach here!
 finish_parse:
 
 # parse all compressed instructions
