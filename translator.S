@@ -144,32 +144,50 @@ or s2, s2, t5                   # [19:12]
 srli t5, t2, 31                 # [20]
 slli t5, t5, 19                 # [20]
 or s2, s2, t5                   # [20]
-sw s2, 28(t1)
+sw s2, 28(t1)                   # save imm
 j parse_main_loop
 
 parse_SB:
 li s2, 0                        # s2 is the result
-lw t3, 28(t1)                   # imm
+srli t5, t2, 8                  # [4:1]
+andi t5, t5, 0b1111             # [4:1]
+or s2, s2, t5                   # [4:1]
+srli t5, t2, 25                 # [10:5]
+andi t5, t5, 0b111111           # [10:5]
+slli t5, t5, 4                  # [10:5]
+or s2, s2, t5                   # [10:5]
+srli t5, t2, 7                  # [11]
+andi t5, t5, 1                  # [11]
+slli t5, t5, 10                 # [11]
+or s2, s2, t5                   # [11]
+srli t5, t2, 31                 # [12]
+slli t5, t5, 11                 # [12]
+or s2, s2, t5                   # [12]
+sw s2, 28(t1)                   # save imm
 j parse_main_loop
 
 parse_R:
 li s2, 0                        # s2 is the result
-lw t3, 28(t1)                   # imm
+
+sw s2, 28(t1)                   # save imm
 j parse_main_loop
 
 parse_U:
 li s2, 0                        # s2 is the result
-lw t3, 28(t1)                   # imm
+
+sw s2, 28(t1)                   # save imm
 j parse_main_loop
 
 parse_S:
 li s2, 0                        # s2 is the result
-lw t3, 28(t1)                   # imm
+
+sw s2, 28(t1)                   # save imm
 j parse_main_loop
 
 parse_I:
 li s2, 0                        # s2 is the result
-lw t3, 28(t1)                   # imm
+
+sw s2, 28(t1)                   # save imm
 j parse_main_loop
 
 j parse_main_loop               # Should never reach here!
