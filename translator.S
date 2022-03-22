@@ -657,7 +657,7 @@ update:                         # This instruction is about offsets/addresses, r
 lw t4, 28(t2)                   # t4 = imm (32-bit)
 bge t4, zero, update_positive   # imm >= 0
 j update_negative               # imm < 0
-
+# imm >= 0
 update_positive:
 mv s2, t1                       # s2 is the location of 16-bit instruction
 li s3, 0                        # Updated value
@@ -674,10 +674,22 @@ j inner_pos
 end_pos:
 sw s3, 28(t2)                   # Write s3 to memory
 j update_main_loop              # Go back to loop
-
+# imm < 0
 update_negative:
-
-
+sub s2, t1, s8                  # s2 is the location of 16-bit instruction
+li s3, 0                        # Updated value
+inner_neg:
+beqz t4, end_neg                # if (t4 == 0) break;
+lw s4, 0(s2)                    # s4 = s2 -> originalValue
+addi t4, t4, 4
+beqz s4, L2200                  # A random number (time) to prevent duplicate
+addi t4, t4, -2
+L2200:
+addi s3, s3, -4                 # move offset by -4
+sub s2, s2, s8                  # Go to the prev instruction
+j inner_neg
+end_neg:
+sw s3, 28(t2)                   # Write s3 to memory
 j update_main_loop              # Go back to loop
 end_update:
 
