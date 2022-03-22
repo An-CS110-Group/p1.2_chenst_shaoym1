@@ -7,7 +7,7 @@
 #   When we test your project, we will change the input files content.
 
 # DO NOT REMOVE THIS LINE WHEN SUBMITTING
-# .import input.S
+.import input.S
 
 # Your code to convert the RVC codes to RVI codes.
 
