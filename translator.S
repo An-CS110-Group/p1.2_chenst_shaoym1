@@ -639,7 +639,47 @@ j expand_main_loop              # Go to next instruction
 end_expand:
 
 # update all addresses
-add zero, zero, zero
+li t0, 0                        # t0 is the number if instruction we are dealing with
+update_main_loop:
+beq t0, s7, end_update          # if (t0 == s7) finish
+mul t1, t0, s8                  # relative address of compressed instruction
+add t1, t1, s10                 # t1 is the position of current 16-bit instruction
+mul t2, t0, s9                  # relative address of 32-bit instruction
+add t2, t2, s11                 # t2 is the position of current 32-bit instruction
+addi t0, t0, 1                  # t0 += 1
+lw t3, 4(t2)                    # t3 = opcode (32-bit)
+li t4, 0x63                     # SB-type
+beq t4, t3, update              # SB-type
+li t4, 0x6F                     # UJ-type
+beq t4, t3, update              # UJ-type
+j update_main_loop              # This instruction has nothing to do about offsets/addresses
+update:                         # This instruction is about offsets/addresses, requires updating
+lw t4, 28(t2)                   # t4 = imm (32-bit)
+bge t4, zero, update_positive   # imm >= 0
+j update_negative               # imm < 0
+
+update_positive:
+mv s2, t1                       # s2 is the location of 16-bit instruction
+li s3, 0                        # Updated value
+inner_pos:
+beqz t4, end_pos                # if (t4 == 0) break;
+lw s4, 0(s2)                    # s4 = s2 -> originalValue
+addi t4, t4, -4
+beqz s4, L2151                  # A random number (time) to prevent duplicate
+addi t4, t4, 2
+L2151:
+addi s3, s3, 4                  # move offset by +4
+add s2, s2, s8                  # Go to the next instruction
+j inner_pos
+end_pos:
+sw s3, 28(t2)                   # Write s3 to memory
+j update_main_loop              # Go back to loop
+
+update_negative:
+
+
+j update_main_loop              # Go back to loop
+end_update:
 
 # write "originalValue" field for instructions
 add zero, zero, zero
