@@ -522,35 +522,114 @@ sw t3, 28(t2)                   # store imm
 j expand_next
 
 ex_ANDI:
-# TODO: ANDI
+li t3, 0b111                    # funct3 = 0b111
+sw t3, 12(t2)                   # store funct3
+li t3, 0b0010011                # opcode = 0b0010011
+sw t3, 4(t2)                    # store opcode
+lbu t3, 12(t1)                  # t3 = rd'/rs1' (compressed)
+addi t3, t3, 0b1000             # t3 = rd/rs1 (32-bit)
+sw t3, 8(t2)                    # store rd
+sw t3, 16(t2)                   # store rs1
+lw t3, 16(t1)                   # t3 = imm
+slli t3, t3, 26                 # sign-extended imm
+srai t3, t3, 26                 # sign-extended imm
+sw t3, 28(t2)                   # store imm
 j expand_next
 
 ex_LI:
-# TODO: LI
+li t3, 0b000                    # funct3 = 0b000
+sw t3, 12(t2)                   # store funct3
+li t3, 0b0010011                # opcode = 0b0010011
+sw t3, 4(t2)                    # store opcode
+lbu t3, 12(t1)                  # t3 = rd'/rs1' (compressed)
+addi t3, t3, 0b1000             # t3 = rd (32-bit)
+sw t3, 8(t2)                    # store rd
+li t3, 0                        # rs1 = 0
+sw t3, 16(t2)                   # store rs1
+lw t3, 16(t1)                   # t3 = imm
+slli t3, t3, 26                 # sign-extended imm
+srai t3, t3, 26                 # sign-extended imm
+sw t3, 28(t2)                   # store imm
 j expand_next
 
 ex_LUI:
-# TODO: LUI
+li t3, 0b0010111                # opcode = 0b0110111
+sw t3, 4(t2)                    # store opcode
+lbu t3, 8(t1)                   # t3 = rd
+sw t3, 8(t2)                    # store rd
+lw t3, 16(t1)                   # t3 = imm
+slli t3, t3, 26                 # sign-extended imm, 26 is correct!
+srai t3, t3, 26                 # sign-extended imm, not 14!
+sw t3, 28(t2)                   # store imm
 j expand_next
 
 ex_ADDI:
-# TODO: ADDI
+li t3, 0b000                    # funct3 = 0b000
+sw t3, 12(t2)                   # store funct3
+li t3, 0b0010011                # opcode = 0b0010011
+sw t3, 4(t2)                    # store opcode
+lbu t3, 12(t1)                  # t3 = rd'/rs1' (compressed)
+addi t3, t3, 0b1000             # t3 = rd/rs1 (32-bit)
+sw t3, 8(t2)                    # store rd
+sw t3, 16(t2)                   # store rs1
+lw t3, 16(t1)                   # t3 = imm
+slli t3, t3, 26                 # sign-extended imm
+srai t3, t3, 26                 # sign-extended imm
+sw t3, 28(t2)                   # store imm
 j expand_next
 
 ex_BEQZ:
-# TODO: BEQZ
+li t3, 0b000                    # funct3 = 0b000
+sw t3, 12(t2)                   # store funct3
+li t3, 0b1100011                # opcode = 0b1100011
+sw t3, 4(t2)                    # store opcode
+li t3, 0                        # rs2 = 0
+sw t3, 20(t2)                   # store rs2
+lbu t3, 10(t1)                  # t3 = rs1' (compressed)
+addi t3, t3, 0b1000             # t3 = rs1 (32-bit)
+sw t3, 16(t2)                   # store rs1
+lw t3, 16(t1)                   # t3 = imm
+slli t3, t3, 24                 # sign-extended imm
+srai t3, t3, 24                 # sign-extended imm
+sw t3, 28(t2)                   # store imm
 j expand_next
 
 ex_BNEZ:
-# TODO: BNEZ
+li t3, 0b001                    # funct3 = 0b001
+sw t3, 12(t2)                   # store funct3
+li t3, 0b1100011                # opcode = 0b1100011
+sw t3, 4(t2)                    # store opcode
+li t3, 0                        # rs2 = 0
+sw t3, 20(t2)                   # store rs2
+lbu t3, 10(t1)                  # t3 = rs1' (compressed)
+addi t3, t3, 0b1000             # t3 = rs1 (32-bit)
+sw t3, 16(t2)                   # store rs1
+lw t3, 16(t1)                   # t3 = imm
+slli t3, t3, 24                 # sign-extended imm
+srai t3, t3, 24                 # sign-extended imm
+sw t3, 28(t2)                   # store imm
 j expand_next
 
 ex_J:
-# TODO: J
+li t3, 0b1101111                # opcode = 0b1101111
+sw t3, 4(t2)                    # store opcode
+li t3, 0                        # rd = 0
+sw t3, 8(t2)                    # store rd
+lw t3, 16(t1)                   # t3 = imm
+slli t3, t3, 21                 # sign-extended imm
+srai t3, t3, 21                 # sign-extended imm
+sw t3, 28(t2)                   # store imm
 j expand_next
 
 ex_JAL:
-# TODO: JAL
+li t3, 0b1101111                # opcode = 0b1101111
+sw t3, 4(t2)                    # store opcode
+li t3, 1                        # rd = 1
+sw t3, 8(t2)                    # store rd
+lw t3, 16(t1)                   # t3 = imm
+slli t3, t3, 21                 # sign-extended imm
+srai t3, t3, 21                 # sign-extended imm
+sw t3, 28(t2)                   # store imm
 j expand_next
 
 
