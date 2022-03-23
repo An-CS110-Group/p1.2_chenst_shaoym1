@@ -910,6 +910,9 @@ sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_I:
+lw t3, 24(t1)                   # load funct7
+slli t3, t3, 25                 # load funct7
+or t2, t2, t3                   # load funct7
 lw t3, 8(t1)                    # load rd
 slli t3, t3, 7                  # load rd
 or t2, t2, t3                   # load rd
