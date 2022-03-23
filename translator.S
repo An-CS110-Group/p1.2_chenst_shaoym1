@@ -32,6 +32,9 @@ li a1, 100              # 100 items in total
 li a2, 20               # size of item "instruction"
 ecall                   # transfer control to OS(venus here) to calloc space
 mv s10, a0              # global var s10, to save the address
+
+li s6, 0                # if (s6 == 0) no_16-bit
+
 # setup complete
 la s0, rvc_codes                # load the address of first instruction
 li t0, 0                        # current working instruction
@@ -58,8 +61,11 @@ mul t2, t0, s8                  # Get the location of t0-th compressed instructi
 add t2, t2, s10                 # Absolute address of t0-th compressed instruction
 sw s1, 0(t2)                    # save word to it
 addi t0, t0, 1                  # Next instruction
+li s6, 1                # 16-bit exists
 j read_next                     # Go back to loop
 finish_reading:
+
+beqz s6, end_write_ori          # directly print
 
 # parse all 32-bit instructions here
 li t0, 0                        # t0 is the number of instruction we are dealing with
@@ -864,8 +870,6 @@ sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_R:
-lw s6, 0(t1)                    # Check out whether it was a 32-bit instruction
-bnez s6, write_origin_loop
 lw t3, 8(t1)                    # load rd
 slli t3, t3, 7                  # load rd
 or t2, t2, t3                   # load rd
@@ -885,8 +889,6 @@ sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_U:
-lw s6, 0(t1)                    # Check out whether it was a 32-bit instruction
-bnez s6, write_origin_loop
 lw t3, 8(t1)                    # load rd
 slli t3, t3, 7                  # load rd
 or t2, t2, t3                   # load rd
@@ -897,8 +899,6 @@ sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_S:
-lw s6, 0(t1)                    # Check out whether it was a 32-bit instruction
-bnez s6, write_origin_loop
 lw t3, 12(t1)                   # load funct3
 slli t3, t3, 12                 # load funct3
 or t2, t2, t3                   # load funct3
@@ -919,8 +919,6 @@ sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_I:
-lw s6, 0(t1)                    # Check out whether it was a 32-bit instruction
-bnez s6, write_origin_loop
 lw t3, 24(t1)                   # load funct7
 slli t3, t3, 25                 # load funct7
 or t2, t2, t3                   # load funct7
