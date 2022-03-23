@@ -746,6 +746,7 @@ beq t4, t3, update              # UJ-type
 j update_main_loop              # This instruction has nothing to do about offsets/addresses
 update:                         # This instruction is about offsets/addresses, requires updating
 lw t4, 28(t2)                   # t4 = imm (32-bit)
+slli t4, t4, 1                  # Get actual imm
 bge t4, zero, update_positive   # imm >= 0
 j update_negative               # imm < 0
 # imm >= 0
@@ -763,6 +764,7 @@ addi s3, s3, 4                  # move offset by +4
 add s2, s2, s8                  # Go to the next instruction
 j inner_pos
 end_pos:
+srli s3, s3, 1                  # imm is a multiple of 2
 sw s3, 28(t2)                   # Write s3 to memory
 j update_main_loop              # Go back to loop
 # imm < 0
@@ -780,6 +782,7 @@ addi s3, s3, -4                 # move offset by -4
 sub s2, s2, s8                  # Go to the prev instruction
 j inner_neg
 end_neg:
+srli s3, s3, 1                  # imm is a multiple of 2
 sw s3, 28(t2)                   # Write s3 to memory
 j update_main_loop              # Go back to loop
 end_update:
