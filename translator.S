@@ -189,7 +189,7 @@ j parse_main_loop               # Should never reach here!
 finish_parse:
 
 gotoend: 
-j end_write_ori
+beqz s6, gotoend1
 
 # parse all compressed instructions
 li t0, 0                        # t0 is the number of (compressed) instruction we are dealing with
@@ -356,6 +356,9 @@ sw t4, 16(t1)                   # save imm to memory
 j parse_CI_main_loop
 
 finish_parse_CI:
+
+gotoend1: 
+beqz s6, end_write_ori
 
 # expand all compressed instructions
 li t0, 0                        # t0 is the number if instruction we are dealing with
