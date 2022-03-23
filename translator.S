@@ -864,6 +864,8 @@ sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_R:
+lw s6, 0(t1)                    # Check out whether it was a 32-bit instruction
+beqz s6, write_origin_loop
 lw t3, 8(t1)                    # load rd
 slli t3, t3, 7                  # load rd
 or t2, t2, t3                   # load rd
@@ -883,6 +885,8 @@ sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_U:
+lw s6, 0(t1)                    # Check out whether it was a 32-bit instruction
+beqz s6, write_origin_loop
 lw t3, 8(t1)                    # load rd
 slli t3, t3, 7                  # load rd
 or t2, t2, t3                   # load rd
@@ -893,6 +897,8 @@ sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_S:
+lw s6, 0(t1)                    # Check out whether it was a 32-bit instruction
+beqz s6, write_origin_loop
 lw t3, 12(t1)                   # load funct3
 slli t3, t3, 12                 # load funct3
 or t2, t2, t3                   # load funct3
@@ -913,6 +919,8 @@ sw t2, 0(t1)                    # store originalValue
 j write_origin_loop
 
 write_I:
+lw s6, 0(t1)                    # Check out whether it was a 32-bit instruction
+beqz s6, write_origin_loop
 lw t3, 24(t1)                   # load funct7
 slli t3, t3, 25                 # load funct7
 or t2, t2, t3                   # load funct7
