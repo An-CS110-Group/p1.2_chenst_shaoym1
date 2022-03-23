@@ -379,7 +379,7 @@ sw t3, 4(t2)                    # save opcode
 lbu t3, 10(t1)                  # t3 = rs1' (compressed)
 addi t3, t3, 0b1000             # t3 = rs1 (32-bit)
 sw t3, 16(t2)                   # save rs1
-lbu t3, 12(t1)                  # t3 = rd' (compressed)
+lbu t3, 11(t1)                  # t3 = rd' (compressed) (stored in rs2' field)
 addi t3, t3, 0b1000             # t3 = rd (32-bit)
 sw t3, 8(t2)                    # save rd
 lw t3, 16(t1)                   # 16-bit imm
