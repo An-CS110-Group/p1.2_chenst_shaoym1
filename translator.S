@@ -900,7 +900,7 @@ lw t3, 20(t1)                   # load rs2
 slli t3, t3, 20                 # load rs2
 or t2, t2, t3                   # load rs2
 lw t3, 28(t1)                   # imm
-addi t4, t3, 0b11111            # load[4:0]
+andi t4, t3, 0b11111            # load[4:0]
 slli t4, t4, 7                  # load[4:0]
 or t2, t2, t4                   # load[4:0]
 srli t4, t3, 5                  # load[11:5]
