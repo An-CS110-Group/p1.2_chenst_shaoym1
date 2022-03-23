@@ -65,7 +65,7 @@ li s6, 1                # 16-bit exists
 j read_next                     # Go back to loop
 finish_reading:
 
-beqz s6, end_write_ori          # directly print
+beqz s6, gotoend        # directly print
 
 # parse all 32-bit instructions here
 li t0, 0                        # t0 is the number of instruction we are dealing with
@@ -187,6 +187,9 @@ j parse_main_loop
 
 j parse_main_loop               # Should never reach here!
 finish_parse:
+
+gotoend: 
+j end_write_ori
 
 # parse all compressed instructions
 li t0, 0                        # t0 is the number of (compressed) instruction we are dealing with
