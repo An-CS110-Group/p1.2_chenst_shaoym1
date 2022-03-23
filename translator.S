@@ -645,7 +645,7 @@ sw t3, 28(t2)                   # store imm
 j expand_next
 
 ex_LUI:
-li t3, 0b0010111                # opcode = 0b0110111
+li t3, 0b0110111                # opcode = 0b0110111
 sw t3, 4(t2)                    # store opcode
 lbu t3, 8(t1)                   # t3 = rd
 sw t3, 8(t2)                    # store rd
