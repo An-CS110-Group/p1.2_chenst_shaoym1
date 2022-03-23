@@ -199,8 +199,8 @@ sb t3, 5(t1)                    # store funct3 to memory
 srli t3, t2, 10                 # funct6 = originalValue >> 10;
 sb t3, 6(t1)                    # store funct6 to memory
                 # funct2 here
-srli t3, t2, 10                 # if (ov >> 10 == 0b11)
-addi t3, t3, -0b11              # if (ov >> 10 == 0b11)
+srli t3, t2, 10                 # if (ov >> 10 == 0b100011)
+addi t3, t3, -0b100011          # if (ov >> 10 == 0b100011)
 srli t4, t2, 5                  # (ov >> 5)
 beqz t3, L1                     # keep t4
 srli t4, t2, 10                 # modify t4 -> (ov >> 10)
@@ -571,7 +571,7 @@ j expand_next
 ex_SUB:
 li t3, 0b0100000                # funct7 = 0b0100000
 sw t3, 24(t2)                   # store funct7
-li t3, 0b111                    # funct3 = 0b111
+li t3, 0b000                    # funct3 = 0b000
 sw t3, 12(t2)                   # store funct3
 li t3, 0b0110011                # opcode = 0b0110011
 sw t3, 4(t2)                    # store opcode
